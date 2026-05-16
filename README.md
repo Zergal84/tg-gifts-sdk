@@ -6,6 +6,7 @@ Unified async Python SDK for Telegram Gifts marketplaces (Tonnel, Portals, Fragm
 [![PyPI](https://img.shields.io/pypi/v/tg-gifts-sdk.svg)](https://pypi.org/project/tg-gifts-sdk/)
 [![Python](https://img.shields.io/pypi/pyversions/tg-gifts-sdk.svg)](https://pypi.org/project/tg-gifts-sdk/)
 [![License](https://img.shields.io/pypi/l/tg-gifts-sdk.svg)](https://github.com/Zergal84/tg-gifts-sdk/blob/main/LICENSE)
+[![codecov](https://codecov.io/gh/Zergal84/tg-gifts-sdk/branch/main/graph/badge.svg)](https://codecov.io/gh/Zergal84/tg-gifts-sdk)
 
 ## Status (v0.1.0)
 

@@ -33,5 +33,15 @@ jobs:
       - name: Type-check with mypy
         run: mypy
 
-      - name: Run unit tests
-        run: pytest -v --tb=short
+      - name: Install coverage
+        run: pip install coverage pytest-cov
+
+      - name: Run unit tests with coverage
+        run: pytest -v --tb=short --cov=tg_gifts_sdk --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
