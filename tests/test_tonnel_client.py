@@ -31,6 +31,7 @@ def mock_post(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         url: str, *, json_body: dict[str, Any], headers: dict[str, str],
         impersonate: str = "firefox133",
         timeout: float = 30.0,  # noqa: ASYNC109 — mirrors sync curl_cffi timeout
+        proxy: str | None = None, max_retries: int = 0,
     ) -> tuple[int, Any]:
         calls.append({"url": url, "json": json_body, "headers": headers})
         if responses:
@@ -190,3 +191,60 @@ async def test_client_context_manager_is_required(auth_data: str) -> None:
     client = TonnelClient(auth_data=auth_data)
     assert client.auth_data == auth_data
     await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_proxy_is_forwarded(auth_data: str, mock_post: dict[str, Any]) -> None:
+    """When client is constructed with proxy=, the value reaches post_json."""
+    captured: list[str | None] = []
+    from tg_gifts_sdk import tonnel as tonnel_mod
+
+    async def capturing_post(
+        url: str, *, json_body: dict[str, Any], headers: dict[str, str],
+        impersonate: str = "firefox133",
+        timeout: float = 30.0,  # noqa: ASYNC109 — mirrors sync curl_cffi timeout
+        proxy: str | None = None, max_retries: int = 0,
+    ) -> tuple[int, Any]:
+        captured.append(proxy)
+        return (200, [])
+
+    tonnel_mod.post_json = capturing_post  # direct rebind (monkeypatch via fixture would be same)
+
+    async with TonnelClient(auth_data=auth_data, proxy="http://localhost:8080") as client:
+        await client.fetch_listings()
+
+    assert captured == ["http://localhost:8080"]
+
+
+@pytest.mark.asyncio
+async def test_max_concurrent_constrains_parallel_calls(auth_data: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    """asyncio.Semaphore caps simultaneous in-flight POSTs."""
+    import asyncio as _asyncio
+
+    from tg_gifts_sdk import tonnel as tonnel_mod
+
+    active = 0
+    peak = [0]
+    lock = _asyncio.Lock()
+
+    async def slow_post(
+        url: str, *, json_body: dict[str, Any], headers: dict[str, str],
+        impersonate: str = "firefox133",
+        timeout: float = 30.0,  # noqa: ASYNC109 — mirrors sync curl_cffi timeout
+        proxy: str | None = None, max_retries: int = 0,
+    ) -> tuple[int, Any]:
+        nonlocal active
+        async with lock:
+            active += 1
+            peak[0] = max(peak[0], active)
+        await _asyncio.sleep(0.05)
+        async with lock:
+            active -= 1
+        return (200, [])
+
+    monkeypatch.setattr(tonnel_mod, "post_json", slow_post)
+
+    async with TonnelClient(auth_data=auth_data, max_concurrent=2) as client:
+        await _asyncio.gather(*[client.fetch_listings() for _ in range(6)])
+
+    assert peak[0] <= 2

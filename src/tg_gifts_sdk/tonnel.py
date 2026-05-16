@@ -15,6 +15,7 @@ keep the public surface conservative; the marketplace's signing protocol
 """
 from __future__ import annotations
 
+import asyncio
 import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -107,9 +108,15 @@ class TonnelClient:
         *,
         auth_data: str,
         timeout: float = 30.0,
+        proxy: str | None = None,
+        max_concurrent: int = 4,
+        max_retries: int = 2,
     ) -> None:
         self.auth_data = auth_data
         self.timeout = timeout
+        self.proxy = proxy
+        self.max_retries = max_retries
+        self._semaphore = asyncio.Semaphore(max_concurrent)
 
     async def __aenter__(self) -> TonnelClient:
         return self
@@ -167,12 +174,15 @@ class TonnelClient:
             "user_auth": self.auth_data,
         }
 
-        status, body = await post_json(
-            f"{TONNEL_API_BASE}/pageGifts",
-            json_body=payload,
-            headers=build_firefox_headers(origin=TONNEL_ORIGIN, host=TONNEL_HOST),
-            timeout=self.timeout,
-        )
+        async with self._semaphore:
+            status, body = await post_json(
+                f"{TONNEL_API_BASE}/pageGifts",
+                json_body=payload,
+                headers=build_firefox_headers(origin=TONNEL_ORIGIN, host=TONNEL_HOST),
+                timeout=self.timeout,
+                proxy=self.proxy,
+                max_retries=self.max_retries,
+            )
 
         if status != 200:
             raise MarketplaceUnavailableError(
@@ -199,12 +209,15 @@ class TonnelClient:
 
     async def fetch_floor_stats(self) -> list[FloorStats]:
         self._require_auth()
-        status, body = await post_json(
-            f"{TONNEL_API_BASE}/filterStats",
-            json_body={"authData": self.auth_data},
-            headers=build_firefox_headers(origin=TONNEL_ORIGIN, host=TONNEL_HOST),
-            timeout=self.timeout,
-        )
+        async with self._semaphore:
+            status, body = await post_json(
+                f"{TONNEL_API_BASE}/filterStats",
+                json_body={"authData": self.auth_data},
+                headers=build_firefox_headers(origin=TONNEL_ORIGIN, host=TONNEL_HOST),
+                timeout=self.timeout,
+                proxy=self.proxy,
+                max_retries=self.max_retries,
+            )
 
         if status != 200:
             raise MarketplaceUnavailableError(
@@ -249,12 +262,15 @@ class TonnelClient:
 
     async def fetch_balance(self) -> BalanceInfo:
         self._require_auth()
-        status, body = await post_json(
-            f"{TONNEL_API_BASE}/balance/info",
-            json_body={"authData": self.auth_data},
-            headers=build_firefox_headers(origin=TONNEL_ORIGIN, host=TONNEL_HOST),
-            timeout=self.timeout,
-        )
+        async with self._semaphore:
+            status, body = await post_json(
+                f"{TONNEL_API_BASE}/balance/info",
+                json_body={"authData": self.auth_data},
+                headers=build_firefox_headers(origin=TONNEL_ORIGIN, host=TONNEL_HOST),
+                timeout=self.timeout,
+                proxy=self.proxy,
+                max_retries=self.max_retries,
+            )
 
         if status != 200:
             raise MarketplaceUnavailableError(

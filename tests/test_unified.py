@@ -23,6 +23,7 @@ def mock_post(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         url: str, *, json_body: dict[str, Any], headers: dict[str, str],
         impersonate: str = "firefox133",
         timeout: float = 30.0,  # noqa: ASYNC109 — mirrors sync curl_cffi timeout
+        proxy: str | None = None, max_retries: int = 0,
     ) -> tuple[int, Any]:
         calls.append({"url": url, "json": json_body})
         if responses:
