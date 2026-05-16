@@ -105,3 +105,10 @@ async def test_unified_returns_partial_on_one_venue_failure(auth_data: str, mock
 
     assert len(listings) == 1
     assert listings[0].marketplace == "tonnel"
+
+
+def test_aggregate_alias_is_unified() -> None:
+    """DoD spec uses tg_gifts_sdk.aggregate.UnifiedClient; we provide it as alias."""
+    from tg_gifts_sdk.aggregate import UnifiedClient as Aggregated
+    from tg_gifts_sdk.unified import UnifiedClient as Direct
+    assert Aggregated is Direct
