@@ -29,7 +29,8 @@ def mock_post(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
 
     async def fake_post(
         url: str, *, json_body: dict[str, Any], headers: dict[str, str],
-        impersonate: str = "firefox133", timeout: float = 30.0,
+        impersonate: str = "firefox133",
+        timeout: float = 30.0,  # noqa: ASYNC109 — mirrors sync curl_cffi timeout
     ) -> tuple[int, Any]:
         calls.append({"url": url, "json": json_body, "headers": headers})
         if responses:
@@ -41,7 +42,7 @@ def mock_post(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
 
 
 @pytest.mark.asyncio
-async def test_fetch_listings_parses_response(auth_data: str, mock_post: dict) -> None:
+async def test_fetch_listings_parses_response(auth_data: str, mock_post: dict[str, Any]) -> None:
     mock_post["responses"].append((200, [
         {
             "gift_id": 12345, "gift_name": "Plush Pepe", "gift_num": 42,
@@ -59,7 +60,7 @@ async def test_fetch_listings_parses_response(auth_data: str, mock_post: dict) -
         listings = await client.fetch_listings(gift_name="Plush Pepe", limit=10)
 
     assert len(listings) == 2
-    assert all(isinstance(l, Listing) for l in listings)
+    assert all(isinstance(item, Listing) for item in listings)
     assert listings[0].marketplace == "tonnel"
     assert listings[0].gift_id == 12345
     assert listings[0].price == 800.0
@@ -73,7 +74,7 @@ async def test_fetch_listings_parses_response(auth_data: str, mock_post: dict) -
 
 
 @pytest.mark.asyncio
-async def test_fetch_listings_drops_malformed_items(auth_data: str, mock_post: dict) -> None:
+async def test_fetch_listings_drops_malformed_items(auth_data: str, mock_post: dict[str, Any]) -> None:
     mock_post["responses"].append((200, [
         {"gift_id": 1, "gift_name": "X", "gift_num": 1, "price": 10.0, "asset": "TON"},
         "not_a_dict",
@@ -85,11 +86,11 @@ async def test_fetch_listings_drops_malformed_items(auth_data: str, mock_post: d
         listings = await client.fetch_listings(limit=10)
 
     assert len(listings) == 2
-    assert [l.gift_id for l in listings] == [1, 2]
+    assert [item.gift_id for item in listings] == [1, 2]
 
 
 @pytest.mark.asyncio
-async def test_fetch_listings_wraps_envelope(auth_data: str, mock_post: dict) -> None:
+async def test_fetch_listings_wraps_envelope(auth_data: str, mock_post: dict[str, Any]) -> None:
     """Tonnel sometimes returns {gifts: [...]} or {data: [...]} instead of bare list."""
     mock_post["responses"].append((200, {
         "gifts": [
@@ -104,7 +105,7 @@ async def test_fetch_listings_wraps_envelope(auth_data: str, mock_post: dict) ->
 
 
 @pytest.mark.asyncio
-async def test_fetch_listings_raises_on_http_error(auth_data: str, mock_post: dict) -> None:
+async def test_fetch_listings_raises_on_http_error(auth_data: str, mock_post: dict[str, Any]) -> None:
     mock_post["responses"].append((403, "blocked by CloudFlare"))
 
     async with TonnelClient(auth_data=auth_data) as client:
@@ -116,14 +117,14 @@ async def test_fetch_listings_raises_on_http_error(auth_data: str, mock_post: di
 
 
 @pytest.mark.asyncio
-async def test_fetch_listings_requires_auth(mock_post: dict) -> None:
+async def test_fetch_listings_requires_auth(mock_post: dict[str, Any]) -> None:
     with pytest.raises(AuthDataMissingError):
         async with TonnelClient(auth_data="") as client:
             await client.fetch_listings()
 
 
 @pytest.mark.asyncio
-async def test_fetch_floor_stats_parses_envelope(auth_data: str, mock_post: dict) -> None:
+async def test_fetch_floor_stats_parses_envelope(auth_data: str, mock_post: dict[str, Any]) -> None:
     mock_post["responses"].append((200, {
         "status": "success",
         "data": {
@@ -154,7 +155,7 @@ async def test_fetch_floor_stats_parses_envelope(auth_data: str, mock_post: dict
 
 
 @pytest.mark.asyncio
-async def test_fetch_balance_parses_response(auth_data: str, mock_post: dict) -> None:
+async def test_fetch_balance_parses_response(auth_data: str, mock_post: dict[str, Any]) -> None:
     mock_post["responses"].append((200, {
         "balance": 42.5,
         "usdtBalance": 12.0,
@@ -173,7 +174,7 @@ async def test_fetch_balance_parses_response(auth_data: str, mock_post: dict) ->
 
 
 @pytest.mark.asyncio
-async def test_fetch_balance_handles_missing_fields(auth_data: str, mock_post: dict) -> None:
+async def test_fetch_balance_handles_missing_fields(auth_data: str, mock_post: dict[str, Any]) -> None:
     mock_post["responses"].append((200, {}))
 
     async with TonnelClient(auth_data=auth_data) as client:

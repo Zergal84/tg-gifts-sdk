@@ -17,10 +17,13 @@ deals. MAX is conservative and historically calibrates well in paper testing.
 """
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from tg_gifts_sdk.models import FloorStats, Listing
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from tg_gifts_sdk.models import FloorStats, Listing
 
 
 @dataclass(frozen=True)

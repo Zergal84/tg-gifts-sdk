@@ -11,10 +11,14 @@ If you want to contribute a working implementation, see CONTRIBUTING.md.
 """
 from __future__ import annotations
 
-from types import TracebackType
+from typing import TYPE_CHECKING
 
 from tg_gifts_sdk.exceptions import NotImplementedYetError
-from tg_gifts_sdk.models import FloorStats, Listing
+
+if TYPE_CHECKING:
+    from types import TracebackType
+
+    from tg_gifts_sdk.models import FloorStats, Listing
 
 
 class FragmentClient:

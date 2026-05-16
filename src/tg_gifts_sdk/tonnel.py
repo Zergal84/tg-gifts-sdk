@@ -17,8 +17,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from types import TracebackType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from tg_gifts_sdk._http import build_firefox_headers, post_json
 from tg_gifts_sdk.exceptions import (
@@ -26,6 +25,9 @@ from tg_gifts_sdk.exceptions import (
     MarketplaceUnavailableError,
 )
 from tg_gifts_sdk.models import FloorStats, Listing
+
+if TYPE_CHECKING:
+    from types import TracebackType
 
 TONNEL_API_BASE = "https://gifts2.tonnel.network/api"
 TONNEL_ORIGIN = "https://marketplace.tonnel.network"

@@ -84,7 +84,7 @@ def test_listing_rejects_negative_price() -> None:
 def test_floor_stats_rejects_unknown_marketplace() -> None:
     with pytest.raises(ValueError):
         FloorStats(
-            marketplace="unknown_market",
+            marketplace="unknown_market",  # type: ignore[arg-type]
             collection="X", floor=1.0,
             models={}, backdrops={}, symbols={},
         )

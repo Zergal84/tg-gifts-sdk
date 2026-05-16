@@ -5,7 +5,6 @@ from typing import Any
 
 import pytest
 
-from tg_gifts_sdk import Listing
 from tg_gifts_sdk.unified import UnifiedClient
 
 
@@ -22,7 +21,8 @@ def mock_post(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
 
     async def fake_post(
         url: str, *, json_body: dict[str, Any], headers: dict[str, str],
-        impersonate: str = "firefox133", timeout: float = 30.0,
+        impersonate: str = "firefox133",
+        timeout: float = 30.0,  # noqa: ASYNC109 — mirrors sync curl_cffi timeout
     ) -> tuple[int, Any]:
         calls.append({"url": url, "json": json_body})
         if responses:
@@ -34,7 +34,7 @@ def mock_post(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
 
 
 @pytest.mark.asyncio
-async def test_unified_listings_calls_only_implemented_clients(auth_data: str, mock_post: dict) -> None:
+async def test_unified_listings_calls_only_implemented_clients(auth_data: str, mock_post: dict[str, Any]) -> None:
     """Default `venues=None` skips stubbed Portals/Fragment, returns Tonnel results."""
     mock_post["responses"].append((200, [
         {"gift_id": 1, "gift_name": "X", "gift_num": 1, "price": 10.0, "asset": "TON"},
@@ -48,7 +48,7 @@ async def test_unified_listings_calls_only_implemented_clients(auth_data: str, m
 
 
 @pytest.mark.asyncio
-async def test_unified_can_target_single_venue(auth_data: str, mock_post: dict) -> None:
+async def test_unified_can_target_single_venue(auth_data: str, mock_post: dict[str, Any]) -> None:
     mock_post["responses"].append((200, [
         {"gift_id": 1, "gift_name": "X", "gift_num": 1, "price": 10.0, "asset": "TON"},
     ]))
@@ -56,11 +56,11 @@ async def test_unified_can_target_single_venue(auth_data: str, mock_post: dict) 
     async with UnifiedClient(tonnel_auth=auth_data) as client:
         listings = await client.fetch_listings(venues=["tonnel"])
 
-    assert all(l.marketplace == "tonnel" for l in listings)
+    assert all(item.marketplace == "tonnel" for item in listings)
 
 
 @pytest.mark.asyncio
-async def test_unified_explicit_stub_venue_returns_empty(auth_data: str, mock_post: dict) -> None:
+async def test_unified_explicit_stub_venue_returns_empty(auth_data: str, mock_post: dict[str, Any]) -> None:
     async with UnifiedClient(tonnel_auth=auth_data) as client:
         listings = await client.fetch_listings(venues=["portals"])
 
@@ -68,7 +68,7 @@ async def test_unified_explicit_stub_venue_returns_empty(auth_data: str, mock_po
 
 
 @pytest.mark.asyncio
-async def test_unified_raise_on_unimplemented_when_requested(auth_data: str, mock_post: dict) -> None:
+async def test_unified_raise_on_unimplemented_when_requested(auth_data: str, mock_post: dict[str, Any]) -> None:
     from tg_gifts_sdk import NotImplementedYetError
 
     async with UnifiedClient(tonnel_auth=auth_data) as client:
@@ -80,7 +80,7 @@ async def test_unified_raise_on_unimplemented_when_requested(auth_data: str, moc
 
 
 @pytest.mark.asyncio
-async def test_unified_floor_stats_tonnel_only(auth_data: str, mock_post: dict) -> None:
+async def test_unified_floor_stats_tonnel_only(auth_data: str, mock_post: dict[str, Any]) -> None:
     mock_post["responses"].append((200, {
         "status": "success",
         "data": {"X": {"floor": 100, "models": {}, "backdrops": {}, "symbols": {}}},
@@ -95,7 +95,7 @@ async def test_unified_floor_stats_tonnel_only(auth_data: str, mock_post: dict) 
 
 
 @pytest.mark.asyncio
-async def test_unified_returns_partial_on_one_venue_failure(auth_data: str, mock_post: dict) -> None:
+async def test_unified_returns_partial_on_one_venue_failure(auth_data: str, mock_post: dict[str, Any]) -> None:
     mock_post["responses"].append((200, [
         {"gift_id": 1, "gift_name": "X", "gift_num": 1, "price": 10.0, "asset": "TON"},
     ]))

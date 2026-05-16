@@ -10,14 +10,18 @@ Future behaviour (when stubs are filled in): same surface, no caller changes.
 """
 from __future__ import annotations
 
-from types import TracebackType
-from typing import Any
+import contextlib
+from typing import TYPE_CHECKING, Any
 
 from tg_gifts_sdk.exceptions import NotImplementedYetError
 from tg_gifts_sdk.fragment import FragmentClient
-from tg_gifts_sdk.models import FloorStats, Listing, Marketplace
 from tg_gifts_sdk.portals import PortalsClient
 from tg_gifts_sdk.tonnel import TonnelClient
+
+if TYPE_CHECKING:
+    from types import TracebackType
+
+    from tg_gifts_sdk.models import FloorStats, Listing, Marketplace
 
 
 class UnifiedClient:
@@ -54,10 +58,8 @@ class UnifiedClient:
 
     async def aclose(self) -> None:
         for c in (self.tonnel, self.portals, self.fragment):
-            try:
+            with contextlib.suppress(Exception):
                 await c.aclose()
-            except Exception:
-                pass
 
     async def fetch_listings(
         self,

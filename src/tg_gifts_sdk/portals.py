@@ -12,10 +12,14 @@ The unified `Listing` model in `tg_gifts_sdk.models` is the target shape.
 """
 from __future__ import annotations
 
-from types import TracebackType
+from typing import TYPE_CHECKING
 
 from tg_gifts_sdk.exceptions import NotImplementedYetError
-from tg_gifts_sdk.models import FloorStats, Listing
+
+if TYPE_CHECKING:
+    from types import TracebackType
+
+    from tg_gifts_sdk.models import FloorStats, Listing
 
 
 class PortalsClient:

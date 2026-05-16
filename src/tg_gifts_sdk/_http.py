@@ -54,17 +54,18 @@ async def post_json(
     json_body: dict[str, Any],
     headers: dict[str, str],
     impersonate: str = "firefox133",
-    timeout: float = 30.0,
+    timeout: float = 30.0,  # noqa: ASYNC109 — sync timeout forwarded to curl_cffi, not asyncio
 ) -> tuple[int, dict[str, Any] | list[Any] | str]:
     """Async wrapper around curl_cffi.requests.post — returns (status, json-or-text)."""
 
     def _do() -> tuple[int, Any]:
         resp = curl_requests.post(
             url, json=json_body, headers=headers,
-            impersonate=impersonate, timeout=timeout,
+            impersonate=impersonate,  # type: ignore[arg-type]
+            timeout=timeout,
         )
         try:
-            return resp.status_code, resp.json()
+            return resp.status_code, resp.json()  # type: ignore[no-untyped-call]
         except Exception:
             return resp.status_code, resp.text[:500]
 

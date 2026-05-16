@@ -1,10 +1,8 @@
 """Trait-aware scoring tests — pure functions."""
 from __future__ import annotations
 
-import pytest
-
 from tg_gifts_sdk import FloorStats, Listing
-from tg_gifts_sdk.scoring import FairValueQuote, find_deals, score_listing
+from tg_gifts_sdk.scoring import find_deals, score_listing
 
 
 def _listing(*, price: float, model: str | None = None, backdrop: str | None = None,
