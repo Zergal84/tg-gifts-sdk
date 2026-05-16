@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tg-gifts-sdk"
+version = "0.1.0"
+description = "Unified async Python SDK for Telegram Gifts marketplaces (Tonnel, Portals, Fragment)"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [
+    { name = "Arsenii", email = "noreply@example.com" },
+]
+keywords = ["telegram", "gifts", "tonnel", "portals", "fragment", "ton", "blockchain", "marketplace"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "curl_cffi>=0.7",
+    "httpx>=0.27",
+    "pydantic>=2.5",
+    "tenacity>=8.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "respx>=0.20",
+    "mypy>=1.8",
+    "ruff>=0.4",
+    "pre-commit>=3.6",
+]
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.24",
+]
+
+[project.urls]
+Homepage = "https://github.com/Zergal84/tg-gifts-sdk"
+Repository = "https://github.com/Zergal84/tg-gifts-sdk"
+Issues = "https://github.com/Zergal84/tg-gifts-sdk/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tg_gifts_sdk"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "integration: live network tests (skipped unless TONNEL_AUTH_DATA env set)",
+]
+addopts = "-ra --strict-markers"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+no_implicit_reexport = false
+files = ["src/tg_gifts_sdk", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["curl_cffi.*"]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RET", "TCH", "ASYNC"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011", "TCH"]
