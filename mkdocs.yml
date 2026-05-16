@@ -28,6 +28,7 @@ theme:
 nav:
   - Home: index.md
   - Quickstart: quickstart.md
+  - API Reference: api.md
   - Tutorials:
       - Floor monitoring: tutorials/floor-monitoring.md
       - Arbitrage detection: tutorials/arbitrage-detection.md
@@ -35,6 +36,14 @@ nav:
 
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_root_heading: true
+            show_signature_annotations: true
+            separate_signature: true
 
 markdown_extensions:
   - admonition
