@@ -14,7 +14,7 @@ from tg_gifts_sdk.scoring import FairValueQuote, find_deals, score_listing
 from tg_gifts_sdk.tonnel import BalanceInfo, TonnelClient
 from tg_gifts_sdk.unified import UnifiedClient
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "FloorStats", "Gift", "Listing", "Marketplace", "Trait",

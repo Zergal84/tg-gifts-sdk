@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-05-17
+
+### Added
+- `tg_gifts_sdk.aggregate.UnifiedClient` alias module (matches DoD path)
+- `TonnelClient(proxy=, max_concurrent=, max_retries=)` parameters
+- Built-in tenacity retry-on-5xx with exponential backoff (max 2 retries by default)
+- Built-in asyncio.Semaphore rate limiting (max 4 in-flight requests by default)
+- HTTP/HTTPS proxy support via `proxy=` keyword
+- Auto-generated API reference page via mkdocstrings
+- GitHub Pages deploy workflow for mkdocs site
+- Auto-publish to PyPI on `v*` tag push
+- Python 3.10 added to CI matrix
+- Codecov coverage tracking + README badge
+
+### Changed
+- `requires-python` lowered from `>=3.11` to `>=3.10`
+- Two new tests covering proxy forwarding + semaphore concurrency cap
+
 ## [0.1.0] — 2026-05-16
 
 ### Added

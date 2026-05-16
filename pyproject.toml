@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tg-gifts-sdk"
-version = "0.1.0"
+version = "0.1.1"
 description = "Unified async Python SDK for Telegram Gifts marketplaces (Tonnel, Portals, Fragment)"
 readme = "README.md"
 license = { file = "LICENSE" }
