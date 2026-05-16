@@ -1,0 +1,48 @@
+site_name: tg-gifts-sdk
+site_description: Unified async Python SDK for Telegram Gifts marketplaces
+site_url: https://zergal84.github.io/tg-gifts-sdk/
+repo_url: https://github.com/Zergal84/tg-gifts-sdk
+repo_name: Zergal84/tg-gifts-sdk
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.top
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - Tutorials:
+      - Floor monitoring: tutorials/floor-monitoring.md
+      - Arbitrage detection: tutorials/arbitrage-detection.md
+      - Trait-aware scoring: tutorials/trait-aware-scoring.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
